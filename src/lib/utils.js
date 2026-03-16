@@ -7,9 +7,9 @@ export const cn = (...i) => twMerge(clsx(i))
 /** Genera todos los slots del día según duración del servicio */
 export function generateSlots(durationMin = 30) {
   const slots = []
-  for (let h = 9; h < 20; h++) {
+  for (let h = 10; h < 22; h++) {
     for (let m = 0; m < 60; m += durationMin) {
-      if (h === 19 && m > 0) break
+      if (h === 21 && m > 0) break
       const label = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`
       slots.push({ label, blocked: BLOCKED_SLOTS.includes(label) })
     }

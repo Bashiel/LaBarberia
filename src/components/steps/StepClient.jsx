@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { User, Phone, MessageCircle, CheckCircle2 } from 'lucide-react'
+import { User, Phone, MessageCircle } from 'lucide-react'
 import { DAYS_LONG, MONTHS_LONG } from '../../lib/constants'
 import { buildWAMessage } from '../../lib/utils'
+import { supabase } from '../../lib/supabase'
 
 function WhatsAppSVG() {
   return (
@@ -13,31 +14,56 @@ function WhatsAppSVG() {
 }
 
 export default function StepClient({ branch, service, date, time, onReset }) {
-  const [name,   setName]   = useState('')
-  const [phone,  setPhone]  = useState('')
-  const [done,   setDone]   = useState(false)
+  const [name,    setName]    = useState('')
+  const [phone,   setPhone]   = useState('')
+  const [done,    setDone]    = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState(null)
 
   const dateStr = date
     ? `${DAYS_LONG[date.getDay()]} ${date.getDate()} de ${MONTHS_LONG[date.getMonth()]}`
     : ''
 
-  const canConfirm = name.trim().length >= 2 && phone.trim().length >= 7
+  const fechaISO = date ? date.toISOString().split('T')[0] : ''
+  const canConfirm = name.trim().length >= 2 && phone.trim().length >= 7 && !loading
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!canConfirm) return
+    setLoading(true)
+    setError(null)
+
+    // Guardar el turno en Supabase
+    const { error: dbError } = await supabase
+      .from('turnos')
+      .insert({
+        sucursal: branch.name,
+        fecha: fechaISO,
+        hora: time,
+        servicio: service.name,
+        cliente: name.trim(),
+      })
+
+    if (dbError) {
+      setError('Hubo un problema al guardar el turno. Intentá de nuevo.')
+      setLoading(false)
+      return
+    }
+
+    // Abrir WhatsApp con el mensaje
     const msg = buildWAMessage({ branch, service, dateStr, timeStr: time, clientName: name.trim() })
     const url = `https://wa.me/${branch.whatsapp}?text=${encodeURIComponent(msg)}`
     setDone(true)
+    setLoading(false)
     setTimeout(() => window.open(url, '_blank'), 350)
   }
 
-  /* ── Pantalla de éxito ── */
+  // Pantalla de éxito
   if (done) {
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.45, ease: [0.22,1,0.36,1] }}
+        transition={{ duration: 0.45 }}
         className="text-center py-2"
       >
         <motion.div
@@ -49,53 +75,45 @@ export default function StepClient({ branch, service, date, time, onReset }) {
           ✅
         </motion.div>
 
-        <h3 className="font-display font-bold text-xl mb-1">¡Turno enviado!</h3>
+        <h3 className="font-display font-bold text-xl mb-1">Turno confirmado!</h3>
         <p className="text-white/40 text-sm mb-6">
-          Se abrió WhatsApp listo para enviar a{' '}
+          Se abrio WhatsApp listo para enviar a{' '}
           <span className="text-white/70 font-medium">{branch.name}</span>.
         </p>
 
-        {/* Resumen */}
         <div className="glass rounded-2xl p-4 mb-6 text-left space-y-2.5">
           {[
-            { icon:'📍', label:'Sucursal',  val: branch.name },
-            { icon:'✂️', label:'Servicio',  val: service.name },
-            { icon:'📅', label:'Día',       val: dateStr },
-            { icon:'⏰', label:'Hora',      val: `${time} hs` },
-            { icon:'👤', label:'Cliente',   val: name },
+            { l:'Sucursal', v: branch.name },
+            { l:'Servicio', v: service.name },
+            { l:'Dia',      v: dateStr },
+            { l:'Hora',     v: `${time} hs` },
+            { l:'Cliente',  v: name },
           ].map(row => (
-            <div key={row.label} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-sm">{row.icon}</span>
-                <span className="text-white/35 text-[12px]">{row.label}</span>
-              </div>
-              <span className="text-white/80 text-[13px] font-semibold text-right max-w-[55%] leading-tight">
-                {row.val}
-              </span>
+            <div key={row.l} className="flex items-center justify-between">
+              <span className="text-white/35 text-[12px]">{row.l}</span>
+              <span className="text-white/80 text-[13px] font-semibold text-right max-w-[60%] leading-tight">{row.v}</span>
             </div>
           ))}
         </div>
 
         <button onClick={onReset} className="btn-ghost w-full py-3 text-sm">
-          ↩ Hacer otra reserva
+          Hacer otra reserva
         </button>
       </motion.div>
     )
   }
 
-  /* ── Formulario ── */
+  // Formulario
   return (
     <motion.div
       initial={{ opacity: 0, x: 24 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -24 }}
-      transition={{ duration: 0.35, ease: [0.22,1,0.36,1] }}
+      transition={{ duration: 0.35 }}
     >
-      <p className="text-white/45 text-[13px] mb-5">
-        Último paso: tus datos para la reserva.
-      </p>
+      <p className="text-white/45 text-[13px] mb-5">Ultimo paso: tus datos para la reserva.</p>
 
-      {/* Resumen compacto */}
+      {/* Resumen */}
       <div className="glass rounded-xl px-4 py-3 mb-5 grid grid-cols-2 gap-x-4 gap-y-2">
         {[
           { l:'Servicio', v: service.name },
@@ -123,7 +141,6 @@ export default function StepClient({ branch, service, date, time, onReset }) {
             className="w-full bg-white/[.05] border border-white/[.08] rounded-xl pl-10 pr-4 py-3.5 text-[14px] text-white placeholder-white/25 outline-none focus:border-purple-500/60 focus:bg-white/[.07] transition-all font-body"
           />
         </div>
-
         <div className="relative">
           <Phone size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
           <input
@@ -131,23 +148,27 @@ export default function StepClient({ branch, service, date, time, onReset }) {
             value={phone}
             onChange={e => setPhone(e.target.value.replace(/[^0-9+\s\-()\b]/g, ''))}
             maxLength={20}
-            placeholder="Número de teléfono"
+            placeholder="Numero de telefono"
             className="w-full bg-white/[.05] border border-white/[.08] rounded-xl pl-10 pr-4 py-3.5 text-[14px] text-white placeholder-white/25 outline-none focus:border-purple-500/60 focus:bg-white/[.07] transition-all font-body"
           />
         </div>
       </div>
 
+      {/* Error */}
+      {error && (
+        <p className="text-red-400 text-[12px] mb-4 text-center">{error}</p>
+      )}
+
       {/* WhatsApp notice */}
       <div className="flex items-start gap-2.5 bg-green-500/[.06] border border-green-400/15 rounded-[13px] p-3 mb-5">
         <MessageCircle size={15} className="text-green-400 flex-shrink-0 mt-0.5" />
         <p className="text-[12px] text-white/40 leading-relaxed">
-          Se abrirá <span className="text-green-400 font-semibold">WhatsApp</span> con el mensaje
-          listo para enviar a la sucursal de{' '}
-          <span className="text-white/60">{branch.name}</span>.
+          Se abrira <span className="text-green-400 font-semibold">WhatsApp</span> con el mensaje
+          listo para enviar a <span className="text-white/60">{branch.name}</span>.
         </p>
       </div>
 
-      {/* Botón */}
+      {/* Boton confirmar */}
       <motion.button
         whileHover={canConfirm ? { scale: 1.02 } : {}}
         whileTap={canConfirm ? { scale: 0.97 } : {}}
@@ -160,7 +181,7 @@ export default function StepClient({ branch, service, date, time, onReset }) {
         }
       >
         <WhatsAppSVG />
-        {canConfirm ? 'Confirmar Turno por WhatsApp' : 'Completá los datos'}
+        {loading ? 'Guardando...' : canConfirm ? 'Confirmar Turno por WhatsApp' : 'Completa los datos'}
       </motion.button>
     </motion.div>
   )

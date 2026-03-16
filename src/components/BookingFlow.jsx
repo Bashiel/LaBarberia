@@ -115,6 +115,7 @@ export default function BookingFlow({ branch, onChangeBranch }) {
                 time={time}
                 onDateChange={setDate}
                 onTimeChange={setTime}
+                branch={branch}
               />
             )}
             {step === 2 && (
