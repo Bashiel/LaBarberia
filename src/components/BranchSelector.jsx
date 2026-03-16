@@ -34,12 +34,16 @@ export default function BranchSelector({ onSelect }) {
 
         {/* Icon */}
         <motion.div
-          animate={{ y: [0,-8,0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          className="text-[64px] mb-4 leading-none"
-        >
-          💈
-        </motion.div>
+  animate={{ y: [0,-8,0] }}
+  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+  className="mb-4"
+>
+  <img
+    src="/favicon.png"
+    alt="La Barbería"
+    className="w-24 h-24 object-contain mx-auto"
+  />
+</motion.div>
 
         {/* Headline */}
         <h1 className="font-display font-extrabold text-[clamp(34px,10vw,52px)] leading-[1.05] mb-3">
