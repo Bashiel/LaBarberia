@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-[#08080e] text-white antialiased;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-purple-700 rounded-full;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    background: linear-gradient(135deg, #a855f7, #ec4899, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 14px;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    color: #d8b4fe;
+  }
+
+  .btn-primary {
+    @apply text-white font-semibold transition-all duration-300;
+    background: linear-gradient(135deg, #7c3aed, #ec4899, #f97316);
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(124, 58, 237, 0.45);
+  }
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    @apply transition-all duration-300;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.70);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-ghost:hover {
+    border-color: rgba(168, 85, 247, 0.50);
+    color: #fff;
+    background: rgba(168, 85, 247, 0.08);
+  }
+
+  .service-card {
+    @apply cursor-pointer transition-all duration-300 relative overflow-hidden;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+  }
+  .service-card::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(236, 72, 153, 0.08));
+  }
+  .service-card:hover {
+    border-color: rgba(168, 85, 247, 0.30);
+    transform: translateY(-3px);
+  }
+  .service-card:hover::before,
+  .service-card.selected::before {
+    opacity: 1;
+  }
+  .service-card.selected {
+    border-color: #a855f7;
+    background: rgba(168, 85, 247, 0.10);
+    box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.2), 0 8px 32px rgba(124, 58, 237, 0.2);
+  }
+
+  .benefit-card {
+    @apply p-5 transition-all duration-300;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+  }
+  .benefit-card:hover {
+    border-color: rgba(168, 85, 247, 0.20);
+    background: rgba(168, 85, 247, 0.04);
+    transform: translateY(-2px);
+  }
+}
+
+@layer utilities {
+  .h-13 { height: 3.25rem; }
+  .font-display { font-family: 'Syne', sans-serif; }
+  .font-body    { font-family: 'DM Sans', system-ui, sans-serif; }
+}
