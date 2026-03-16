@@ -8,7 +8,7 @@ export const BRANCHES = [
     emoji: '📍',
     gradient: 'from-purple-600 to-pink-500',
     glowRgba: '124,58,237',
-    whatsapp: '5492265407060',
+    whatsapp: '5493872533708',
   },
   {
     id: 'bic614',
@@ -17,7 +17,7 @@ export const BRANCHES = [
     emoji: '🏠',
     gradient: 'from-pink-500 to-orange-500',
     glowRgba: '236,72,153',
-    whatsapp: '5492265407060',
+    whatsapp: '5493872533708',
   },
   {
     id: 'huaico',
@@ -26,7 +26,7 @@ export const BRANCHES = [
     emoji: '✨',
     gradient: 'from-orange-500 to-purple-600',
     glowRgba: '249,115,22',
-    whatsapp: '5492265407060',
+    whatsapp: '5493872533708',
   },
 ]
 
