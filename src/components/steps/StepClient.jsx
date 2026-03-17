@@ -54,7 +54,7 @@ export default function StepClient({ branch, service, date, time, onReset }) {
     const url = `https://wa.me/${branch.whatsapp}?text=${encodeURIComponent(msg)}`
     setDone(true)
     setLoading(false)
-    setTimeout(() => window.open(url, '_blank'), 350)
+    setTimeout(() => window.location.href = url, 350)
   }
 
   // Pantalla de éxito
